@@ -41,8 +41,7 @@ RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
 RUN echo "tzdata tzdata/Areas select Asia" > /tmp/preseed.txt && \
     echo "tzdata tzdata/Zones/Asia select Dhaka" >> /tmp/preseed.txt && \
     sudo debconf-set-selections /tmp/preseed.txt && \
-    sudo rm /etc/timezone && \
-    sudo rm /etc/localtime && \
+    sudo rm /etc/timezone; sudo rm /etc/localtime; \
     sudo dpkg-reconfigure -f noninteractive tzdata && \
     apt-get update && \
     apt-get install -y tzdata && \
