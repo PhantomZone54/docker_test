@@ -7,6 +7,9 @@ addon:
   apt:
     update: true
 
+git:
+  depth: 3
+
 services:
   - docker
 
@@ -18,6 +21,7 @@ env:
     - secure: "nkeLobNbG2vxAxSAr6jiSB9oJhb4cXhO0W/83c3oNEmXyJBCux8y16RQP4mSq7zZ4S3E/wh/pv9FOc5/Nl9xJ5mF/0bYMwfLLVw4+hrX4DeiiRVlg74vhFJFXQVf3DLhelNDyVn1LqLc7CTewXHUu8RRqtoyFGJO6oKWdRJKnnBU4x1cdic4/lBjfiY2WMw0JXdq3opIy0v/ml1FDaiiK3BLD5JeIfy8Ayyo0Fo7tCfqcwJRg9P5V80qUXYpsmvDphpUddSac1ba37iCu2AX2nZ6Yk6A6QRloYVi2Iaav3DZLLn52UtcYQJIoTygqFgr02SzBkanWYzEzNbxkBI7mVjYHodJO0uI6PxpLmjjBlXXVY/Np5Snwnwu3oQYfjALLUnUzN+7CvxYQiyk4icaXryphgRt8j3kGtTOvPGHZidSXrxcPhMy0Zy6mLR+Hrwf1zNdsCtT6+Du1WrNjEyxZAf7sKHKrJ0t8yTrJDGnGJfQnjU13wxV3CWKXooisZ6qfzW0WLKA9NarnT1CwNkXhTBAeZ4uNQEgE6xSYDBISZUdaeEr+WlmwYax9nOU5O8n8ps8r7uEIe756GpZInAMg7JwJhWXf+kJgTGOLuZAXQmRXb7McLt0rw0Vw6a7ri1Om/kj5nmZRt8MaOwzUurVifGg0jQ7p308LktqmWUh8So="
 
 script:
+  - "travis_wait 30 sleep 1800 &"
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
 
