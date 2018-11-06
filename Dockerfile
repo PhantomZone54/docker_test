@@ -19,7 +19,7 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 
 ENV MAVEN_VERSION=3.6.0 \
     JAVA_VERSION=8u192 \
-    JAVA_VERSION_PREFIX=1.8.0_191
+    JAVA_VERSION_PREFIX=1.8.0_192
 
 ENV JAVA_HOME=/opt/jdk$JAVA_VERSION_PREFIX \
     M2_HOME=/home/user/apache-maven-$MAVEN_VERSION
@@ -54,9 +54,9 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 USER user
 
 RUN sudo dpkg --add-architecture i386 && \
-    sudo apt-get update -y && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
+    sudo apt-get update -qqy && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
     blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
-    wget unzip mc software-properties-common git && \
+    wget unzip mc software-properties-common && \
     sudo mkdir /var/run/sshd && \
     sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
@@ -68,7 +68,7 @@ RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
     -qO- \
     "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b12/750e1c8617c5452694857ad95c3ee230/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/ && \
     wget -qO- "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C /home/user/apache-maven-$MAVEN_VERSION/ && \
-    cd /home/user && wget --output-document=android-sdk-linux.zip --quiet "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d Android/Sdk/ android-sdk-linux.zip && rm android-sdk-linux.zip
+    cd /home/user && sudo mkdir Android/Sdk && wget --output-document=android-sdk-linux.zip --quiet "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d Android/Sdk/ android-sdk-linux.zip && rm android-sdk-linux.zip
 
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
