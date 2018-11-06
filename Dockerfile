@@ -124,6 +124,8 @@ RUN svn --version && \
 
 ENTRYPOINT ["/home/user/entrypoint.sh"]
 
-EXPOSE 4403 6080 22 WORKDIR /projects
+EXPOSE 4403 6080 22
+
+WORKDIR /projects
 
 CMD tail -f /dev/null
