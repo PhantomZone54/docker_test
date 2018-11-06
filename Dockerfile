@@ -73,27 +73,21 @@ RUN sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/* && \
     yes | "${ANDROID_HOME}"/tools/bin/sdkmanager --licenses
 
-# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-22" && \
-#     "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-23" && \
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-{22,23}" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-24"
 
-# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;25.0.3"
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;26.0.3" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;27.0.3" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;28.0.3"
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;{25.0.3,26.0.3,27.0.3,28.0.3}"
 
 # RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "cmake;3.6.4111459" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "docs" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "emulator" && \
-#     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;gapid;1" && \
-#     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;gapid;3" && \
+#     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;gapid;{1,3}" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;google_play_services" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;instantapps" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;webdriver"
 
 # RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;m2repository"
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2" \
+#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-{layout,layout-solver};1.0.2" \
 #     && "${ANDROID_HOME}"/tools/bin/sdkmanager "lldb;3.1"
 
 # RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "ndk-bundle" && \
@@ -101,20 +95,14 @@ RUN sudo apt-get clean && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "platform-tools" && \
 #     "${ANDROID_HOME}"/tools/bin/sdkmanager "tools"
 
-# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-25"
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-26" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-27" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-28"
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-{25,26,27,28}"
 
-# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-25"
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-26" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-27" \
-#     && "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-28"
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-{25,26,27,28}"
 
-# Uncomment the following to install android-25 arm64-v8a image
-# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "system-images;android-25;google_apis;arm64-v8a"
+# Uncomment the following to install android-25 images
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "system-images;android-25;google_apis;{armeabi-v7a,arm64-v8a}"
     
-RUN echo y | "${ANDROID_HOME}"/tools/bin/sdkmanager --update
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager --update
     # && echo "no" | "${ANDROID_HOME}"/tools/bin/avdmanager create avd \
     #             --name che --target android-25 --abi arm64-v8a
 
@@ -127,7 +115,7 @@ RUN sudo mkdir -p /opt/noVNC/utils/websockify && \
           [end]" | sudo tee -a /etc/X11/blackbox/blackbox-menu && \
     echo "#! /bin/bash\n set -e\n sudo /usr/sbin/sshd -D &\n/usr/bin/supervisord -c /opt/supervisord.conf &\n exec \"\$@\"" > /home/user/entrypoint.sh && chmod a+x /home/user/entrypoint.sh
 
-ADD index.html /opt/noVNC/
+# ADD index.html /opt/noVNC/
 ADD supervisord.conf /opt/
 
 RUN svn --version && \
