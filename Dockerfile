@@ -28,7 +28,7 @@ ENV TERM xterm
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-RUN dpkg-reconfigure locales
+#RUN dpkg-reconfigure locales
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
 ENV ANDROID_HOME=/home/user/android-sdk-linux
