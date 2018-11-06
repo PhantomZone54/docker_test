@@ -1,8 +1,5 @@
 # Copyright (c) 2012-2018 Codenvy, S.A. 
-# All rights reserved. This program and the accompanying materials 
-# are made available under the terms of the Eclipse Public License v1.0 
-# which accompanies this distribution, and is available at 
-# http://www.eclipse.org/legal/epl-v10.html 
+# All rights reserved.
 # Contributors: 
 # Codenvy, S.A. - initial API and implementation
 
@@ -11,7 +8,7 @@
 
 # Build environment for Android, based on Ubuntu Bionic
 
-FROM ubuntu:18.04
+FROM ubuntu:bionic
 MAINTAINER fr3akyphantom <rokibhasansagar2014@outlook.com>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -25,6 +22,8 @@ ENV JAVA_HOME=/opt/jdk$JAVA_VERSION_PREFIX \
     M2_HOME=/home/user/apache-maven-$MAVEN_VERSION
 
 ENV TERM xterm
+RUN apt-get update -qqy && apt-get install -qqy locales && rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
