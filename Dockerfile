@@ -28,23 +28,20 @@ ENV TERM xterm
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-#RUN dpkg-reconfigure locales
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
-ENV ANDROID_HOME=/home/user/android-sdk-linux
+ENV ANDROID_HOME=/home/user/Android/Sdk
 ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
 
-RUN apt-get update && apt-get install -y sudo tzdata && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qqy && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
 
-RUN echo "tzdata tzdata/Areas select Asia" > /tmp/preseed.txt && \
-    echo "tzdata tzdata/Zones/Asia select Dhaka" >> /tmp/preseed.txt && \
-    sudo debconf-set-selections /tmp/preseed.txt && \
-    sudo dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get update && \
-    apt-get install -y tzdata && \
-    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections && \
+    echo 'tzdata tzdata/Zones/Asia select Dhaka' | debconf-set-selections \
+    && apt-get update -qqy && apt-get install -qqy --no-install-recommends tzdata \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
@@ -53,15 +50,15 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 USER user
 
 RUN sudo dpkg --add-architecture i386 && \
-    sudo apt-get update && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
-    blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
-    #python-software-properties \
-    wget unzip mc curl software-properties-common && \
-    sudo mkdir /var/run/sshd && \
-    sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     sudo add-apt-repository ppa:git-core/ppa && \
-    sudo apt-get update && \
-    sudo sudo apt-get install git subversion -y
+    sudo apt-get update -y && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
+    blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
+    wget unzip mc curl software-properties-common git && \
+    sudo mkdir /var/run/sshd && \
+    sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+RUN git clone https://github.com/akhilnarang/scripts akhil/ && \
+    cd akhil/ && bash setup/android_build_env.sh && rm -rf akhil/
 
 RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
     wget \
@@ -71,17 +68,61 @@ RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
     -qO- \
     "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b12/750e1c8617c5452694857ad95c3ee230/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/ && \
     wget -qO- "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C /home/user/apache-maven-$MAVEN_VERSION/ && \
-    cd /home/user && wget --output-document=android-sdk-linux.zip --quiet "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -d android-sdk-linux android-sdk-linux.zip && rm android-sdk-linux.zip
+    cd /home/user && wget --output-document=android-sdk-linux.zip --quiet "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d Android/Sdk/ android-sdk-linux.zip && rm android-sdk-linux.zip
 
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
     sudo rm -rf /var/lib/apt/lists/* && \
-    echo y | android update sdk --all --force --no-ui && \
-    echo "no" | android create avd \
-                --name che \
-                --target android-27 \
-                --abi arm64-v8a && \
-    sudo mkdir -p /opt/noVNC/utils/websockify && \
+    touch ~/.android/repositories.cfg && \
+    yes | "${ANDROID_HOME}"/tools/bin/sdkmanager --licenses
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-22" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-23" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-24"
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;25.0.3" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;26.0.3" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;27.0.3" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "build-tools;28.0.3"
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "cmake;3.6.4111459" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "docs" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "emulator" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;gapid;1" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;gapid;3" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;google_play_services" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;instantapps" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;google;webdriver"
+
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;android;m2repository" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "lldb;3.1"
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "ndk-bundle" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "patcher;v4" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "platform-tools" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "tools"
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-25" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-26" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-27" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "platforms;android-28"
+
+RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-25" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-26" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-27" && \
+    "${ANDROID_HOME}"/tools/bin/sdkmanager "sources;android-28"
+
+# Uncomment the following to install android-25 arm64-v8a image
+# RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "system-images;android-25;google_apis;arm64-v8a"
+    
+RUN echo y | "${ANDROID_HOME}"/tools/bin/sdkmanager --update
+    # && echo "no" | "${ANDROID_HOME}"/tools/bin/avdmanager create avd \
+    #             --name che --target android-25 --abi arm64-v8a
+
+RUN sudo mkdir -p /opt/noVNC/utils/websockify && \
     wget -qO- "http://github.com/kanaka/noVNC/tarball/master" | sudo tar -zx --strip-components=1 -C /opt/noVNC && \
     wget -qO- "https://github.com/kanaka/websockify/tarball/master" | sudo tar -zx --strip-components=1 -C /opt/noVNC/utils/websockify && \
     sudo mkdir -p /etc/X11/blackbox && \
@@ -94,7 +135,7 @@ ADD index.html /opt/noVNC/
 ADD supervisord.conf /opt/
 
 RUN svn --version && \
-sed -i 's/# store-passwords = no/store-passwords = yes/g' /home/user/.subversion/servers && \
+    sed -i 's/# store-passwords = no/store-passwords = yes/g' /home/user/.subversion/servers && \
     sed -i 's/# store-plaintext-passwords = no/store-plaintext-passwords = yes/g' /home/user/.subversion/servers
 
 ENTRYPOINT ["/home/user/entrypoint.sh"]
