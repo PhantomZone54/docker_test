@@ -14,6 +14,9 @@
 FROM ubuntu:18.04
 MAINTAINER fr3akyphantom <rokibhasansagar2014@outlook.com>
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
+
 ENV MAVEN_VERSION=3.6.0 \
     JAVA_VERSION=8u192 \
     JAVA_VERSION_PREFIX=1.8.0_191
@@ -24,6 +27,8 @@ ENV JAVA_HOME=/opt/jdk$JAVA_VERSION_PREFIX \
 ENV TERM xterm
 ENV LANG en_GB.UTF-8
 ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
 ENV ANDROID_HOME=/home/user/android-sdk-linux
@@ -32,6 +37,19 @@ ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
 
 RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+
+RUN sudo locale-gen en_US.UTF-8 || sudo localedef -i en_US -f UTF-8 en_US.UTF-8 && \
+    sudo dpkg-reconfigure locales
+
+RUN echo "tzdata tzdata/Areas select Asia" > /tmp/preseed.txt && \
+    echo "tzdata tzdata/Zones/Asia select Dhaka" >> /tmp/preseed.txt && \
+    sudo debconf-set-selections /tmp/preseed.txt && \
+    sudo rm /etc/timezone && \
+    sudo rm /etc/localtime && \
+    sudo dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get update && \
+    apt-get install -y tzdata && \
+    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
