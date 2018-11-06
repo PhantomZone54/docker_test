@@ -36,12 +36,11 @@ ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
 
-RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y sudo tzdata && rm -rf /var/lib/apt/lists/*
 
 RUN echo "tzdata tzdata/Areas select Asia" > /tmp/preseed.txt && \
     echo "tzdata tzdata/Zones/Asia select Dhaka" >> /tmp/preseed.txt && \
     sudo debconf-set-selections /tmp/preseed.txt && \
-    sudo rm /etc/timezone; sudo rm /etc/localtime; \
     sudo dpkg-reconfigure -f noninteractive tzdata && \
     apt-get update && \
     apt-get install -y tzdata && \
