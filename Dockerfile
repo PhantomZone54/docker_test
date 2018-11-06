@@ -35,13 +35,17 @@ ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
 
-RUN apt-get update -qqy && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
-
 RUN echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections && \
     echo 'tzdata tzdata/Zones/Asia select Dhaka' | debconf-set-selections \
     && apt-get update -qqy && apt-get install -qqy --no-install-recommends tzdata \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -qqy && apt-get install -y sudo git curl wput && rm -rf /var/lib/apt/lists/*
+
+RUN sudo mkdir akhil && \
+    git clone https://github.com/akhilnarang/scripts akhil/ && \
+    cd akhil/ && bash setup/android_build_env.sh && rm -rf akhil/
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
@@ -52,12 +56,9 @@ USER user
 RUN sudo dpkg --add-architecture i386 && \
     sudo apt-get update -y && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
     blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
-    wget unzip mc curl software-properties-common git && \
+    wget unzip mc software-properties-common git && \
     sudo mkdir /var/run/sshd && \
     sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-
-RUN git clone https://github.com/akhilnarang/scripts akhil/ && \
-    cd akhil/ && bash setup/android_build_env.sh && rm -rf akhil/
 
 RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
     wget \
