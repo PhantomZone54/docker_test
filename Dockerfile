@@ -116,7 +116,7 @@ RUN sudo mkdir -p /opt/noVNC/utils/websockify && \
     echo "#! /bin/bash\n set -e\n sudo /usr/sbin/sshd -D &\n/usr/bin/supervisord -c /opt/supervisord.conf &\n exec \"\$@\"" > /home/user/entrypoint.sh && chmod a+x /home/user/entrypoint.sh
 
 # ADD index.html /opt/noVNC/
-ADD supervisord.conf /opt/
+# ADD supervisord.conf /opt/
 
 RUN svn --version && \
     sed -i 's/# store-passwords = no/store-passwords = yes/g' /home/user/.subversion/servers && \
