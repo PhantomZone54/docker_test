@@ -42,7 +42,8 @@ USER user
 RUN sudo dpkg --add-architecture i386 && \
     sudo apt-get update && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
     blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
-    wget unzip mc curl software-properties-common python-software-properties && \
+    #python-software-properties \
+    wget unzip mc curl software-properties-common && \
     sudo mkdir /var/run/sshd && \
     sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     sudo add-apt-repository ppa:git-core/ppa && \
