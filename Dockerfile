@@ -45,7 +45,7 @@ RUN apt-get update -qqy && apt-get install -qqy sudo git curl wput && rm -rf /va
 
 RUN sudo mkdir akhil && \
     git clone https://github.com/akhilnarang/scripts akhil/ && \
-    cd akhil/ && bash setup/android_build_env.sh && rm -rf akhil/
+    cd akhil/ && bash setup/android_build_env.sh 1>/dev/null && rm -rf akhil/
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
@@ -72,8 +72,8 @@ RUN mkdir -p /home/user/android-sdk-linux && \
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
     sudo rm -rf /var/lib/apt/lists/* && \
-    # sudo touch ~/.android/repositories.cfg && \
-    yes | "${ANDROID_HOME}"/tools/bin/sdkmanager --licenses
+    sudo mkdir /home/user/.android & sudo touch /home/user/.android/repositories.cfg && \
+    yes | "${ANDROID_HOME}"/tools/bin/sdkmanager --licenses 1>/dev/null
 
 RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-22" && \
     "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-23" && \
