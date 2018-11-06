@@ -50,7 +50,6 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 USER user
 
 RUN sudo dpkg --add-architecture i386 && \
-    sudo add-apt-repository ppa:git-core/ppa && \
     sudo apt-get update -y && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
     blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
     wget unzip mc curl software-properties-common git && \
