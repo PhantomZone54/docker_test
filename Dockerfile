@@ -30,7 +30,7 @@ ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
-ENV ANDROID_HOME=/home/user/Android/Sdk
+ENV ANDROID_HOME=/home/user/android-sdk-linux
 ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
@@ -41,7 +41,7 @@ RUN echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -qqy && apt-get install -y sudo git curl wput && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qqy && apt-get install -qqy sudo git curl wput && rm -rf /var/lib/apt/lists/*
 
 RUN sudo mkdir akhil && \
     git clone https://github.com/akhilnarang/scripts akhil/ && \
@@ -54,21 +54,20 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 USER user
 
 RUN sudo dpkg --add-architecture i386 && \
-    sudo apt-get update -qqy && sudo apt-get install -y --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
+    sudo apt-get update -qqy && sudo apt-get install -qqy --force-yes expect libswt-gtk-3-java lib32z1 lib32ncurses5 lib32stdc++6 supervisor x11vnc xvfb net-tools \
     blackbox rxvt-unicode xfonts-terminus sudo openssh-server procps \
     wget unzip mc software-properties-common && \
     sudo mkdir /var/run/sshd && \
     sudo sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
-    wget \
-    --no-cookies \
-    --no-check-certificate \
+    wget --no-cookies --no-check-certificate \
     --header "Cookie: oraclelicense=accept-securebackup-cookie" \
     -qO- \
-    "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b12/750e1c8617c5452694857ad95c3ee230/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/ && \
-    wget -qO- "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C /home/user/apache-maven-$MAVEN_VERSION/ && \
-    cd /home/user && sudo mkdir Android/Sdk && wget --output-document=android-sdk-linux.zip --quiet "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d Android/Sdk/ android-sdk-linux.zip && rm android-sdk-linux.zip
+    "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b12/750e1c8617c5452694857ad95c3ee230/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/
+RUN wget -qO- "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C /home/user/apache-maven-$MAVEN_VERSION/
+RUN mkdir -p /home/user/android-sdk-linux && \
+    cd /home/user && wget -q -O android-sdk-linux.zip "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d android-sdk-linux/ android-sdk-linux.zip && rm android-sdk-linux.zip
 
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
