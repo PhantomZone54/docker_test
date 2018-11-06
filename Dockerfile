@@ -72,7 +72,8 @@ RUN mkdir -p /home/user/android-sdk-linux && \
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
     sudo rm -rf /var/lib/apt/lists/* && \
-    sudo mkdir /home/user/.android & sudo touch /home/user/.android/repositories.cfg && \
+    sudo mkdir -p ~/.android && echo "" >> ~/.android/repositories.cfg
+    # sudo mkdir -p /home/user/.android & sudo touch /home/user/.android/repositories.cfg && \
     yes | "${ANDROID_HOME}"/tools/bin/sdkmanager --licenses 1>/dev/null
 
 RUN "${ANDROID_HOME}"/tools/bin/sdkmanager "add-ons;addon-google_apis-google-22" && \
