@@ -25,15 +25,13 @@ ENV TERM xterm
 ENV LANG en_GB.UTF-8
 ENV LANG en_US.UTF-8
 
-RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
-
-RUN sudo locale-gen en_US.UTF-8
-
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
 ENV ANDROID_HOME=/home/user/android-sdk-linux
 ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
 LABEL che:server:6080:ref=VNC che:server:6080:protocol=http
+
+RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
