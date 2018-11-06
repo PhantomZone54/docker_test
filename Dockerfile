@@ -25,6 +25,8 @@ ENV TERM xterm
 ENV LANG en_GB.UTF-8
 ENV LANG en_US.UTF-8
 
+RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+
 RUN sudo locale-gen en_US.UTF-8
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
