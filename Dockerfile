@@ -66,7 +66,7 @@ RUN mkdir /home/user/apache-maven-$MAVEN_VERSION && \
     "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b12/750e1c8617c5452694857ad95c3ee230/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/
 RUN wget -qO- "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C /home/user/apache-maven-$MAVEN_VERSION/
 RUN mkdir -p /home/user/android-sdk-linux && \
-    cd /home/user && wget -q -O android-sdk-linux.zip "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" && unzip -q -d android-sdk-linux/ android-sdk-linux.zip && rm android-sdk-linux.zip
+    cd /home/user && wget -q "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" -O android-sdk-linux.zip && unzip -q -d android-sdk-linux/ android-sdk-linux.zip && rm android-sdk-linux.zip
 
 RUN sudo apt-get clean && \
     sudo apt-get -y autoremove && \
@@ -113,13 +113,14 @@ RUN sudo mkdir -p /opt/noVNC/utils/websockify && \
     echo "[begin] (Blackbox) \n [exec] (Terminal)     {urxvt -fn "xft:Terminus:size=12"} \n \
           [exec] (Emulator) {emulator64-arm -avd che} \n \
           [end]" | sudo tee -a /etc/X11/blackbox/blackbox-menu && \
-    echo "#! /bin/bash\n set -e\n sudo /usr/sbin/sshd -D &\n/usr/bin/supervisord -c /opt/supervisord.conf &\n exec \"\$@\"" > /home/user/entrypoint.sh && chmod a+x /home/user/entrypoint.sh
+    wget -q 'https://raw.githubusercontent.com/codenvy-legacy/dockerfiles/master/ubuntu_android/supervisord.conf' -O /opt/supervisord.conf && \
+    echo -e "#! /bin/bash\n set -e\n sudo /usr/sbin/sshd -D &\n /usr/bin/supervisord -c /opt/supervisord.conf &\n exec \"\$@\"" > /home/user/entrypoint.sh && chmod a+x /home/user/entrypoint.sh
 
-RUN wget -q 'https://raw.githubusercontent.com/codenvy-legacy/dockerfiles/master/ubuntu_android/index.html' && \
-    wget -q 'https://raw.githubusercontent.com/codenvy-legacy/dockerfiles/master/ubuntu_android/supervisord.conf'
+RUN wget -q 'https://raw.githubusercontent.com/codenvy-legacy/dockerfiles/master/ubuntu_android/index.html' -O index.html
+#     && wget -q 'https://raw.githubusercontent.com/codenvy-legacy/dockerfiles/master/ubuntu_android/supervisord.conf' -O supervisord.conf
 
 ADD index.html /opt/noVNC/
-ADD supervisord.conf /opt/
+# ADD supervisord.conf /opt/
 
 RUN svn --version && \
     sed -i 's/# store-passwords = no/store-passwords = yes/g' /home/user/.subversion/servers && \
