@@ -40,11 +40,13 @@ RUN echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -qqy && apt-get install -qqy sudo git curl wput && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qqy && apt-get install -qqy sudo git curl wput && rm -rf /var/lib/apt/lists/* && \
+    sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://github.com/akhilnarang/repo/raw/master/repo \
+    && sudo chmod a+x /usr/local/bin/repo
 
-RUN sudo mkdir akhil && \
-    git clone https://github.com/akhilnarang/scripts akhil/ && \
-    cd akhil/ && bash setup/android_build_env.sh 1>/dev/null && rm -rf akhil/
+# RUN sudo mkdir akhil && \
+#     git clone https://github.com/akhilnarang/scripts akhil/ && \
+#     cd akhil/ && bash setup/android_build_env.sh 1>/dev/null && rm -rf akhil/
 
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user && \
@@ -107,8 +109,8 @@ RUN "${ANDROID_HOME}"/tools/bin/sdkmanager --update
     #             --name che --target android-25 --abi arm64-v8a
 
 RUN sudo mkdir -p /opt/noVNC/utils/websockify && \
-    wget -qO- "http://github.com/kanaka/noVNC/tarball/master" | sudo tar -zx --strip-components=1 -C /opt/noVNC && \
-    wget -qO- "https://github.com/kanaka/websockify/tarball/master" | sudo tar -zx --strip-components=1 -C /opt/noVNC/utils/websockify && \
+    wget -qO- "http://github.com/kanaka/noVNC/tarball/master" | sudo tar -zvx --strip-components=1 -C /opt/noVNC && \
+    wget -qO- "https://github.com/kanaka/websockify/tarball/master" | sudo tar -zvx --strip-components=1 -C /opt/noVNC/utils/websockify && \
     sudo mkdir -p /etc/X11/blackbox && \
     echo "[begin] (Blackbox) \n [exec] (Terminal)     {urxvt -fn "xft:Terminus:size=12"} \n \
           [exec] (Emulator) {emulator64-arm -avd che} \n \
