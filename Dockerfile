@@ -40,7 +40,7 @@ RUN echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -qqy && apt-get install -qqy sudo git curl wput && rm -rf /var/lib/apt/lists/* && \
+RUN apt-get update -qqy && apt-get install -qqy sudo git subversion curl wput build-essential ncurses-dev && rm -rf /var/lib/apt/lists/* && \
     sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://github.com/akhilnarang/repo/raw/master/repo \
     && sudo chmod a+x /usr/local/bin/repo
 
